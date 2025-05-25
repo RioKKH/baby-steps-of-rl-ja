@@ -13,7 +13,7 @@ def R(s):
 
 
 def max_V_on_next_state(s):
-    # If game end, expected value is 0.
+    # If the game ends, the expected value is 0.
     if s in ["happy_end", "bad_end"]:
         return 0
 
@@ -51,10 +51,7 @@ def transit_func(s, a):
         return {state: prob}
     else:
         opposite = "up" if a == "down" else "down"
-        return {
-            next_state(s, a): MOVE_PROB,
-            next_state(s, opposite): 1 - MOVE_PROB
-        }
+        return {next_state(s, a): MOVE_PROB, next_state(s, opposite): 1 - MOVE_PROB}
 
 
 if __name__ == "__main__":
