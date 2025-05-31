@@ -2,9 +2,13 @@ import random
 import numpy as np
 
 
-class CoinToss():
-
+class CoinToss:
     def __init__(self, head_probs, max_episode_steps=30):
+        """
+        param: head_probs: list of probabilities for each coin to show heads.
+          ex. [0.1, 0.8, 0.3] : 3 coins with probabilities 0.1, 0.8, and 0.3.
+        param : max_episode_steps: maximum number of coin tosses in an episode.
+        """
         self.head_probs = head_probs
         self.max_episode_steps = max_episode_steps
         self.toss_count = 0
@@ -18,8 +22,10 @@ class CoinToss():
     def step(self, action):
         final = self.max_episode_steps - 1
         if self.toss_count > final:
-            raise Exception("The step count exceeded maximum. \
-                            Please reset env.")
+            raise Exception(
+                "The step count exceeded maximum. \
+                            Please reset env."
+            )
         else:
             done = True if self.toss_count == final else False
 
@@ -35,9 +41,11 @@ class CoinToss():
             return reward, done
 
 
-class EpsilonGreedyAgent():
-
+class EpsilonGreedyAgent:
     def __init__(self, epsilon):
+        """
+        V : V is a list of estimated values for each coin.
+        """
         self.epsilon = epsilon
         self.V = []
 
@@ -49,6 +57,9 @@ class EpsilonGreedyAgent():
             return np.argmax(self.V)
 
     def play(self, env):
+        """
+        実際にコイントスゲームをプレイするメソッド
+        """
         # Initialize estimation.
         N = [0] * len(env)
         self.V = [0] * len(env)

@@ -1,5 +1,4 @@
-class Planner():
-
+class Planner:
     def __init__(self, env):
         self.env = env
         self.log = []
@@ -30,7 +29,6 @@ class Planner():
 
 
 class ValueIterationPlanner(Planner):
-
     def __init__(self, env):
         super().__init__(env)
 
@@ -56,7 +54,7 @@ class ValueIterationPlanner(Planner):
                     expected_rewards.append(r)
                 max_reward = max(expected_rewards)
                 delta = max(delta, abs(max_reward - V[s]))
-                V[s] = max_reward
+                V[s] = max_reward  # ここが「価値評価の学習」部分
 
             if delta < threshold:
                 break
@@ -66,7 +64,6 @@ class ValueIterationPlanner(Planner):
 
 
 class PolicyIterationPlanner(Planner):
-
     def __init__(self, env):
         super().__init__(env)
         self.policy = {}
@@ -97,12 +94,11 @@ class PolicyIterationPlanner(Planner):
                     action_prob = self.policy[s][a]
                     r = 0
                     for prob, next_state, reward in self.transitions_at(s, a):
-                        r += action_prob * prob * \
-                             (reward + gamma * V[next_state])
+                        r += action_prob * prob * (reward + gamma * V[next_state])
                     expected_rewards.append(r)
                 value = sum(expected_rewards)
                 delta = max(delta, abs(value - V[s]))
-                V[s] = value
+                V[s] = value  # ここが現在の戦略の下での価値関数Vの学習に相当する
             if delta < threshold:
                 break
 
@@ -112,6 +108,7 @@ class PolicyIterationPlanner(Planner):
         self.initialize()
         states = self.env.states
         actions = self.env.actions
+        print(f"INFO: states: {states}")
 
         def take_max_action(action_value_dict):
             return max(action_value_dict, key=action_value_dict.get)
@@ -123,6 +120,8 @@ class PolicyIterationPlanner(Planner):
             self.log.append(self.dict_to_grid(V))
 
             for s in states:
+                print(f"INFO: state: {s}")
+                print(f"INFO: policy: {self.policy[s]}")
                 # Get an action following to the current policy.
                 policy_action = take_max_action(self.policy[s])
 
@@ -140,7 +139,7 @@ class PolicyIterationPlanner(Planner):
                 # Update policy (set best_action prob=1, otherwise=0 (greedy))
                 for a in self.policy[s]:
                     prob = 1 if a == best_action else 0
-                    self.policy[s][a] = prob
+                    self.policy[s][a] = prob  # ここが戦略の改善＝学習に相当する
 
             if update_stable:
                 # If policy isn't updated, stop iteration
