@@ -5,7 +5,6 @@ from frozen_lake_util import show_q_value
 
 
 class Actor(ELAgent):
-
     def __init__(self, env):
         super().__init__(epsilon=-1)
         nrow = env.observation_space.n
@@ -17,26 +16,30 @@ class Actor(ELAgent):
         return np.exp(x) / np.sum(np.exp(x), axis=0)
 
     def policy(self, s):
-        a = np.random.choice(self.actions, 1,
-                             p=self.softmax(self.Q[s]))
+        a = np.random.choice(self.actions, 1, p=self.softmax(self.Q[s]))
         return a[0]
 
 
-class Critic():
-
+class Critic:
     def __init__(self, env):
         states = env.observation_space.n
         self.V = np.zeros(states)
 
 
-class ActorCritic():
-
+class ActorCritic:
     def __init__(self, actor_class, critic_class):
         self.actor_class = actor_class
         self.critic_class = critic_class
 
-    def train(self, env, episode_count=1000, gamma=0.9,
-              learning_rate=0.1, render=False, report_interval=50):
+    def train(
+        self,
+        env,
+        episode_count=1000,
+        gamma=0.9,
+        learning_rate=0.1,
+        render=False,
+        report_interval=50,
+    ):
         actor = self.actor_class(env)
         critic = self.critic_class(env)
 
@@ -53,6 +56,8 @@ class ActorCritic():
                 gain = reward + gamma * critic.V[n_state]
                 estimated = critic.V[s]
                 td = gain - estimated
+                # TD誤差をActorの状態Sにおける行動評価値(Q値),
+                # Criticの状態Sにおける価値関数(V値)の更新に利用
                 actor.Q[s][a] += learning_rate * td
                 critic.V[s] += learning_rate * td
                 s = n_state
