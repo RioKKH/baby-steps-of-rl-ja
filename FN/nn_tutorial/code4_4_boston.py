@@ -2,8 +2,8 @@
 
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.datasets import fetch_california_housing
 
+# from sklearn.datasets import fetch_california_housing
 # from sklearn.datasets import load_boston
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,11 +11,16 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-dataset = fetch_california_housing()
-# dataset = load_boston()
+data_url = "http://lib.stat.cmu.edu/datasets/boston"
+raw_df = pd.read_csv(data_url, sep="\\s+", skiprows=22, header=None)
+data = np.hstack([raw_df.values[::2, :], raw_df.values[1::2, :2]])
+target = raw_df.values[1::2, 2]
+y = target
+X = data
 
-y = dataset.target
-X = dataset.data
+# dataset = load_boston()
+# y = dataset.target
+# X = dataset.data
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
 
@@ -27,12 +32,12 @@ y_test = torch.from_numpy(y_test).float().view(-1, 1)
 
 # モデルの定義
 model = nn.Sequential(
-    nn.BatchNorm1d(8),
-    nn.Linear(in_features=8, out_features=13),
+    nn.BatchNorm1d(13),
+    nn.Linear(in_features=13, out_features=13),
     nn.Softplus(),
     nn.Linear(in_features=13, out_features=1),
-    # nn.BatchNorm1d(13),
-    # nn.Linear(in_features=13, out_features=13),
+    # nn.BatchNorm1d(8),
+    # nn.Linear(in_features=8, out_features=13),
 )
 
 # 損失関数とオプティマイザーの設定
@@ -47,7 +52,7 @@ l1_lambda = 0.01
 # --> その代わりより細かい制御が可能になる
 # --> pytorch lightningなどのライブラリを使うと自動化できる
 model.train()
-for epoch in range(8):
+for epoch in range(20):
     optimizer.zero_grad()
 
     # 順伝播
